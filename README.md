@@ -2,9 +2,10 @@
 
 Proyecto académico desarrollado con HTML, CSS, JavaScript, PHP y MySQL. Permite administrar usuarios y roles, productos, existencias, entradas, salidas y alertas de bajo inventario.
 
-## Integrante
+## Integrantes
 
 - Daniel Martínez Contreras
+- Valeria Reyes Hernandez
 
 ## Módulos
 

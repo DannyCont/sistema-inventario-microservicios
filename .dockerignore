@@ -1,0 +1,10 @@
+.git
+.github
+node_modules
+.env
+*.log
+.idea
+.vscode
+.DS_Store
+test
+docs

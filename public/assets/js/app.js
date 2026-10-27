@@ -36,3 +36,337 @@ function llenarPerfil(){const f=$('#perfilForm');f.nombre.value=usuario.nombre;f
 $('#perfilForm').addEventListener('submit',async e=>{e.preventDefault();try{const d=await request(`${API.usuarios}/perfil.php`,{method:'PUT',body:JSON.stringify(formData(e.target))});usuario=d.usuario;$('#welcome').textContent=`Hola, ${usuario.nombre}`;toast(d.mensaje)}catch(err){toast(err.message,true)}});
 $$('[data-close]').forEach(b=>b.addEventListener('click',()=>b.closest('dialog').close()));
 comprobarSesion();
+
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", async () => {
+        try {
+            const registration =
+                await navigator.serviceWorker.register(
+                    "./service-worker.js"
+                );
+
+            console.log(
+                "Inventia PWA: Service Worker registrado.",
+                registration.scope
+            );
+        } catch (error) {
+            console.error(
+                "Error al registrar el Service Worker:",
+                error
+            );
+        }
+    });
+}
+
+function initNotifications() {
+    const button = document.getElementById('notificationButton');
+    const panel = document.getElementById('notificationPanel');
+    const count = document.getElementById('notificationCount');
+    const list = document.getElementById('notificationList');
+    const markReadButton = document.getElementById('markNotificationsRead');
+
+    // Evitar que el sistema falle silenciosamente si falta un elemento.
+    if (!button || !panel || !count || !list || !markReadButton) {
+        console.error(
+            'FlexiAlmacen: no se pudo inicializar la campana. ' +
+            'Verifica que los IDs del HTML coincidan.',
+            {
+                button,
+                panel,
+                count,
+                list,
+                markReadButton
+            }
+        );
+
+        return;
+    }
+
+    // Evitar registrar los eventos dos veces.
+    if (button.dataset.notificationsInitialized === 'true') {
+        return;
+    }
+
+    button.dataset.notificationsInitialized = 'true';
+
+    // Notificaciones temporales de prueba.
+    // Posteriormente se conectarán con el inventario real.
+    let notifications = [
+        {
+            id: 1,
+            title: 'Bienvenido a FlexiAlmacen',
+            message: 'Aquí aparecerán las alertas importantes de tu inventario.',
+            icon: '📦',
+            time: 'Ahora',
+            read: false
+        }
+    ];
+
+    /**
+     * Actualizar el contador de notificaciones sin leer.
+     */
+    function updateCount() {
+        const unread = notifications.filter(
+            notification => !notification.read
+        ).length;
+
+        count.textContent = unread > 99 ? '99+' : String(unread);
+        count.hidden = unread === 0;
+
+        button.setAttribute(
+            'aria-label',
+            unread > 0
+                ? `Notificaciones: ${unread} sin leer`
+                : 'Abrir notificaciones'
+        );
+    }
+
+    /**
+     * Mostrar las notificaciones dentro del panel.
+     */
+    function renderNotifications() {
+        list.replaceChildren();
+
+        if (notifications.length === 0) {
+            const empty = document.createElement('div');
+            empty.className = 'notification-empty';
+
+            const icon = document.createElement('span');
+            icon.className = 'notification-empty-icon';
+            icon.textContent = '🔔';
+
+            const message = document.createElement('p');
+            message.textContent = 'No hay notificaciones nuevas';
+
+            empty.append(icon, message);
+            list.appendChild(empty);
+
+            updateCount();
+            return;
+        }
+
+        notifications.forEach(notification => {
+            const item = document.createElement('div');
+
+            item.className = 'notification-item';
+            item.tabIndex = 0;
+            item.setAttribute('role', 'button');
+
+            if (notification.read) {
+                item.classList.add('is-read');
+            }
+
+            item.setAttribute(
+                'aria-label',
+                `${notification.title}. ${
+                    notification.read
+                        ? 'Notificación leída'
+                        : 'Marcar como leída'
+                }`
+            );
+
+            // Icono.
+            const icon = document.createElement('div');
+            icon.className = 'notification-icon';
+            icon.textContent = notification.icon || '🔔';
+
+            // Contenido.
+            const content = document.createElement('div');
+            content.className = 'notification-item-content';
+
+            const title = document.createElement('strong');
+            title.textContent = notification.title;
+
+            const message = document.createElement('p');
+            message.textContent = notification.message;
+
+            const time = document.createElement('span');
+            time.className = 'notification-time';
+            time.textContent = notification.time || '';
+
+            content.append(title, message, time);
+            item.append(icon, content);
+
+            // Marcar una notificación como leída.
+            function markOneRead() {
+                if (notification.read) {
+                    return;
+                }
+
+                notification.read = true;
+                renderNotifications();
+            }
+
+            item.addEventListener('click', markOneRead);
+
+            item.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    markOneRead();
+                }
+            });
+
+            list.appendChild(item);
+        });
+
+        updateCount();
+    }
+
+    /**
+     * Abrir y cerrar el panel de notificaciones.
+     */
+    button.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const opening = panel.hidden;
+
+        panel.hidden = !opening;
+
+        button.setAttribute(
+            'aria-expanded',
+            String(opening)
+        );
+    });
+
+    /**
+     * Evitar que un clic dentro del panel lo cierre.
+     */
+    panel.addEventListener('click', event => {
+        event.stopPropagation();
+    });
+
+    /**
+     * Cerrar el panel al hacer clic fuera.
+     */
+    document.addEventListener('click', () => {
+        panel.hidden = true;
+        button.setAttribute('aria-expanded', 'false');
+    });
+
+    /**
+     * Cerrar el panel con Escape.
+     */
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            panel.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+            button.focus();
+        }
+    });
+
+    /**
+     * Marcar todas las notificaciones como leídas.
+     */
+    markReadButton.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        notifications.forEach(notification => {
+            notification.read = true;
+        });
+
+        renderNotifications();
+    });
+
+    /**
+     * Función pública para agregar notificaciones desde otros scripts.
+     *
+     * Ejemplo:
+     * window.addInventoryNotification({
+     *     title: 'Stock bajo',
+     *     message: 'El producto Chocolate tiene pocas existencias.',
+     *     icon: '⚠️'
+     * });
+     */
+    window.addInventoryNotification = function ({
+        key,
+        title,
+        message,
+        icon = '📦'
+    }) {
+        if (!title || !message) {
+            console.error(
+                'FlexiAlmacen: la notificación necesita título y mensaje.'
+            );
+            return;
+        }
+
+        // Si ya existe una alerta con esa key, no la repite.
+        if (key && notifications.some(n => n.key === key)) {
+            return;
+        }
+
+        notifications.unshift({
+            id: Date.now(),
+            key,
+            title,
+            message,
+            icon,
+            time: 'Ahora',
+            read: false
+        });
+
+        renderNotifications();
+    };
+
+    // Renderizar las notificaciones iniciales.
+    renderNotifications();
+
+    console.log('FlexiAlmacen: campana de notificaciones inicializada.');
+}
+
+// Inicializar independientemente del momento de carga del archivo.
+// Inicializar la campana de notificaciones.
+(function () {
+    function iniciarCampana() {
+        const button = document.getElementById('notificationButton');
+
+        // Si el botón no existe, no hacer nada.
+        if (!button) {
+            return;
+        }
+
+        // La función principal ya existe en el archivo.
+        if (typeof initNotifications === 'function') {
+            initNotifications();
+            revisarStockMinimo();
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciarCampana, {
+            once: true
+        });
+    } else {
+        iniciarCampana();
+    }
+})();
+
+async function revisarStockMinimo() {
+    try {
+        const respuesta = await fetch('../servicio-inventario/api/inventario.php?tipo=alertas', {
+            credentials: 'same-origin'
+        });
+        const data = await respuesta.json();
+
+        if (!data.ok) {
+            console.error('FlexiAlmacen: no se pudieron cargar las alertas.', data);
+            return;
+        }
+
+        data.alertas.forEach(producto => {
+            window.addInventoryNotification({
+                key: `stock-${producto.id}`,
+                title: 'Stock bajo',
+                message: `${producto.nombre} tiene ${producto.existencia} ${producto.unidad_medida} (mínimo ${producto.stock_minimo}).`,
+                icon: '⚠️'
+            });
+        });
+    } catch (error) {
+        console.error('FlexiAlmacen: error al revisar el stock mínimo.', error);
+    }
+}
+
+window.revisarStockMinimo = revisarStockMinimo;
+

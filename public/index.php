@@ -2,12 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Sistema de Inventario</title><link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="manifest" href="./manifest.webmanifest" crossorigin="use-credentials">
+  <meta name="theme-color" content="#172554">
+  <title>FlexiAlmacen</title><link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+
+<!-- Pantalla inicio de sesion -->
+
 <main id="loginView" class="login-wrap">
   <form id="loginForm" class="card login-card">
-    <div class="brand">SI</div><h1>Sistema de inventario</h1><p class="muted">Ingresa con tu cuenta</p>
+    <div class="brand">SI</div><h1>FlexiAlmacen</h1><p class="muted">Ingresa con tu cuenta</p>
     <label>Correo<input type="email" name="correo" value="admin@inventario.com" required></label>
     <label>Contraseña<input type="password" name="password" value="123456" required></label>
     <button type="submit">Iniciar sesión</button><p id="loginMsg" class="message"></p>
@@ -15,8 +20,11 @@
 </main>
 
 <div id="appView" class="app hidden">
+
+  <!-- Seccion de menu -->
+
   <aside>
-    <div class="logo"><span>SI</span><strong>Inventario</strong></div>
+    <div class="logo"><span>Flexi</span><strong>Alamcen</strong></div>
     <nav>
       <button data-section="resumen" class="active">Resumen</button>
       <button data-section="productos">Productos</button>
@@ -27,8 +35,82 @@
     </nav>
     <button id="logout" class="danger ghost">Cerrar sesión</button>
   </aside>
+
   <div class="content">
-    <header><div><h2 id="sectionTitle">Resumen</h2><p id="welcome" class="muted"></p></div><span id="roleBadge" class="badge"></span></header>
+    
+    <!-- Apartado de Resumen -->
+     
+    <header class="content-header">  
+      <div>
+        <h2 id="sectionTitle">Resumen</h2>
+        <p id="welcome" class="muted"></p>
+      </div>
+
+      <div class="header-actions">
+        <!-- Campana de notificaciones -->
+        <div class="notification-container">
+            <button
+                type="button"
+                id="notificationButton"
+                class="notification-button"
+                aria-label="Abrir notificaciones"
+                aria-expanded="false"
+                title="Notificaciones"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="23"
+                    height="23"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/>
+                    <path d="M10 21h4"/>
+                </svg>
+
+                <span
+                    id="notificationCount"
+                    class="notification-count"
+                    hidden
+                >0</span>
+            </button>
+
+            <!-- Panel desplegable -->
+            <div
+                id="notificationPanel"
+                class="notification-panel"
+                hidden
+            >
+                <div class="notification-panel-header">
+                    <h3>Notificaciones</h3>
+
+                    <button
+                        type="button"
+                        id="markNotificationsRead"
+                        class="mark-read-button"
+                    >
+                        Marcar leídas
+                    </button>
+                </div>
+
+                <div
+                    id="notificationList"
+                    class="notification-list"
+                >
+                    <div class="notification-empty">
+                        <span class="notification-empty-icon">🔔</span>
+                        <p>No hay notificaciones nuevas</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+      <span id="roleBadge" class="badge"></span>
+    </header>
 
     <section id="resumen" class="section active">
       <div class="stats"><article><small>Productos</small><strong id="totalProductos">0</strong></article><article><small>Unidades</small><strong id="totalUnidades">0</strong></article><article class="warning"><small>Alertas</small><strong id="totalAlertas">0</strong></article></div>
@@ -65,5 +147,6 @@
 <dialog id="productoDialog"><form id="productoForm" class="modal-form"><div class="modal-title"><h3 id="productoFormTitle">Nuevo producto</h3><button type="button" data-close>×</button></div><input type="hidden" name="id"><label>Código<input name="codigo" required></label><label>Nombre<input name="nombre" required></label><label>Descripción<input name="descripcion"></label><label>Categoría<select name="categoria_id"><option value="1">Electrónica</option><option value="2">Papelería</option><option value="3">Limpieza</option><option value="4">Otros</option></select></label><div class="two"><label>Precio<input type="number" name="precio" min="0" step="0.01" required></label><label>Stock mínimo<input type="number" name="stock_minimo" min="0" required></label></div><label>Unidad de medida<input name="unidad_medida" value="Pieza" required></label><button type="submit">Guardar producto</button></form></dialog>
 
 <dialog id="usuarioDialog"><form id="usuarioForm" class="modal-form"><div class="modal-title"><h3>Nuevo usuario</h3><button type="button" data-close>×</button></div><label>Nombre<input name="nombre" required></label><label>Apellidos<input name="apellidos" required></label><label>Correo<input type="email" name="correo" required></label><label>Contraseña<input type="password" name="password" minlength="6" required></label><label>Rol<select name="rol_id"><option value="1">Administrador</option><option value="2">Almacenista</option><option value="3">Consulta</option></select></label><button type="submit">Registrar usuario</button></form></dialog>
-<div id="toast"></div><script src="assets/js/app.js"></script>
+<div id="toast"></div>
+<script src="assets/js/app.js"></script>
 </body></html>

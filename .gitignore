@@ -1,0 +1,11 @@
+.env
+config/local.php
+*.log
+.idea/
+.vscode/
+.DS_Store
+
+
+flexialmacen-ca.crt
+
+config/vendor/

@@ -1,0 +1,13 @@
+{
+    "name": "flexialmacen/web-push",
+    "description": "Envío de alertas de inventario",
+    "require": {
+        "minishlink/web-push": "^10.1"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        },
+        "sort-packages": true
+    }
+}

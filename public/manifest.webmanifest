@@ -1,0 +1,43 @@
+
+{
+  "id": "./",
+  "name": "FlexiAlmacen - Sistema de Inventario",
+  "short_name": "FlexiAlmacen",
+  "description": "Sistema de control de inventario y existencias.",
+  "lang": "es-MX",
+  "start_url": "./index.php",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f7fb",
+  "theme_color": "#172554",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "./screenshots/flexialmacen-desktop.png",
+      "sizes": "1903x999",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FlexiAlmacen en escritorio"
+    },
+    {
+      "src": "./screenshots/flexialmacen-mobile.png",
+      "sizes": "633x883",
+      "type": "image/png",
+      "label": "FlexiAlmacen en móvil"
+    }
+  ]
+}

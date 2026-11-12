@@ -1,0 +1,4 @@
+https://{$FLEXI_LAN_HOST}:8443 {
+	tls internal
+	reverse_proxy web:80
+}

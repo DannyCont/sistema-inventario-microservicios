@@ -34,6 +34,62 @@ Proyecto académico desarrollado con HTML, CSS, JavaScript, PHP y MySQL. Permite
 
 Si MySQL utiliza otra contraseña, editar `config/database.php`.
 
+## Ejecución con Docker (contenedores)
+
+El proyecto incluye `Dockerfile` y `compose.yaml` para ejecutarse sin XAMPP.
+
+```bash
+# 1. Construir la imagen y levantar la aplicación + MySQL
+docker compose up -d --build
+
+# 2. Ver la aplicación
+#    http://localhost:8082/public/
+
+# 3. Revisar el estado de los contenedores
+docker compose ps
+
+# 4. Detener los contenedores
+docker compose down
+```
+
+El contenedor `web` usa `php:8.2-apache` y el contenedor `db` usa `mysql:8.0`, que carga
+automáticamente `database/inventario_completo.sql` la primera vez que se crea el volumen.
+
+> La aplicación se publica en el puerto **8082** porque Jenkins ocupa el puerto 8080.
+
+## Integración continua con Jenkins
+
+El repositorio incluye un `Jenkinsfile` en la raíz con el pipeline de CI:
+
+| Etapa | Qué hace |
+|---|---|
+| 1. Checkout | Obtiene el código desde GitHub |
+| 2. Verificar herramientas | Comprueba `docker` y `docker compose` |
+| 3. Pruebas estáticas | `php -l` sobre todos los archivos PHP dentro de un contenedor |
+| 4. Construir imagen | `docker build -t sistema-inventario:<build> -t sistema-inventario:latest .` |
+| 5. Desplegar | `docker compose up -d` (web + MySQL) |
+| 6. Pruebas funcionales | `ci/smoke-test.ps1`: frontend, login y endpoint protegido |
+| 7. Evidencia | `docker ps`, `docker images` y versión desplegada |
+
+### Configuración en Jenkins
+
+1. Instalar Jenkins y los complementos **Git**, **Pipeline** y **Docker Pipeline**.
+2. Crear una tarea de tipo **Pipeline** llamada `sistema-inventario-ci`.
+3. En *Pipeline* → *Definition* elegir **Pipeline script from SCM**.
+4. SCM: **Git**, URL `https://github.com/DannyCont/sistema-inventario-microservicios.git`, rama `*/main`.
+5. Script Path: `Jenkinsfile`.
+6. Ejecutar **Build Now**.
+
+### Webhook de GitHub (opcional)
+
+En GitHub → *Settings → Webhooks → Add webhook*:
+
+- Payload URL: `http://<servidor-jenkins>:8080/github-webhook/`
+- Content type: `application/json`
+- Evento: *Just the push event*
+
+En la tarea de Jenkins activar **GitHub hook trigger for GITScm polling**.
+
 ## Usuarios de prueba
 
 | Rol | Correo | Contraseña |

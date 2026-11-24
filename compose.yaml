@@ -1,8 +1,10 @@
 services:
   web:
+    image: sistema-inventario:latest
     build: .
     ports:
-      - "8080:80"
+      # Jenkins usa el puerto 8080, por eso la aplicación se publica en 8082
+      - "8082:80"
     environment:
       DB_HOST: db
       DB_NAME: inventario_completo
@@ -11,6 +13,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "php -r \"exit(@fsockopen('127.0.0.1', 80) ? 0 : 1);\""]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
   db:
     image: mysql:8.0

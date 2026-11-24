@@ -21,7 +21,9 @@ services:
       start_period: 10s
 
   db:
-    image: mysql:8.0
+    # Se fija la versión 8.0.36: la imagen "mysql:8.0" más reciente no arranca en
+    # equipos con CPU anteriores a x86-64-v3 (error "exec format error").
+    image: mysql:8.0.36
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: inventario_completo
